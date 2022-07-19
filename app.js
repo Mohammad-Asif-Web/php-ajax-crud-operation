@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    $("#id").css("display", "none");
     showStudent()
     $('#addStd').click(function(){
         addStudent()
@@ -59,21 +60,8 @@ function addStudent(){
 }
 
 // edit students data from list
-
- function updateStudent(){
-    $.ajax({
-        'url' : 'process.php',
-        'type' : 'POST',
-        'data' : {
-            'checker' : 'update'
-        },
-        'success' : function(data){
-            $('#msg').html(data).fadeOut(1000)
-        }
-    })
-}
-
 function editData(id){
+    $("#id").css("display", "block");
     $.ajax({
         'url' : 'process.php',
         'type' : 'POST',
@@ -89,10 +77,38 @@ function editData(id){
             $('#email').val(data.email)
             $('#dist').val(data.district)
             $('#dept').val(data.department)
+            $('#id').val(data.id)
         }
     })
 }
 
 
-
+function updateStudent(){
+    $("#id").css("display", "none");
+    var id = $('#id').val()
+    var myName = $('#myName').val()
+    var fatherName = $('#fName').val()
+    var motherName = $('#mName').val()
+    var email = $('#email').val()
+    var dist = $('#dist').val()
+    var dept = $('#dept').val()
+    $.ajax({
+        'url' : 'process.php',
+        'type' : 'POST',
+        'data' : {
+            'id' : id,
+            'name' : myName,
+            'fName' : fatherName,
+            'mName' : motherName,
+            'email' : email, 
+            'dist' : dist,
+            'dept' : dept,
+            'checker' : 'update'
+        },
+        'success' : function(data){
+            $('#msg').html(data).fadeOut(1000)
+            showStudent()
+        }
+    })
+}
 

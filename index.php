@@ -44,6 +44,7 @@
                     </div>
                     <div class="form-group">
                         <input type="submit" id="upStd" class="form-control mb-2" value="Update Student">
+                        <input type="text" id="id" class="form-control">
                     </div>
                     
                 </form>

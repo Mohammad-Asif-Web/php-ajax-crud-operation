@@ -99,6 +99,7 @@ function show(){
 
 }
 
+// edit specific student data
 function editData(){
     global $con;
     $id = $_POST['id'];
@@ -115,7 +116,27 @@ function editData(){
 
 // Update all Student Data
 function update(){
-    echo '<div class="alert alert-info bg-warning">update success</div>';
+    global $con;
+
+    $id = $_POST['id'];
+    $name = $_POST['name'];
+    $fatherName = $_POST['fName'];
+    $motherName = $_POST['mName'];
+    $email= $_POST['email'];
+    $dist = $_POST['dist'];
+    $dept = $_POST['dept'];
+
+    $sql = "UPDATE student_list SET name ='$name', fatherName = '$fatherName', motherName = '$motherName', email = '$email', district = '$dist', department = '$dept' WHERE id = '$id'";
+    $result = $con->query($sql);
+
+    if($result){
+        echo '<div class="alert alert-success">student updated success</div>';
+    } 
+    else{
+        echo '<div class="alert alert-danger">update not success</div>';
+    }
+
+    
 }
 
 
