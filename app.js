@@ -82,7 +82,7 @@ function editData(id){
     })
 }
 
-
+// update button when edit is complete
 function updateStudent(){
     $("#id").css("display", "none");
     var id = $('#id').val()
@@ -110,5 +110,27 @@ function updateStudent(){
             showStudent()
         }
     })
+}
+
+// Delete Student data
+function deleteData(id){
+    if(confirm(`warning id ${id} will be delete!`)){
+        $.ajax({
+            'url' : 'process.php',
+            'type' : 'POST',
+            'data' : {
+                'id' : id,
+                'checker' : 'delete'
+            },
+            'success' : function(data){
+                $('#msg').html(data).fadeOut(1000)
+                showStudent()
+            }
+        })
+    }
+    else{
+        var msg = '<div class="alert alert-danger">Delete Unsuccessful</div>'
+        $('#msg').html(msg).fadeOut(1000)
+    }
 }
 

@@ -88,7 +88,8 @@ function show(){
                     <td>".$data['district']."</td>
                     <td>".$data['department']."</td>
                     <td><button onclick='editData({$data['id']})' class='btn btn-sm btn-secondary' >Edit</button></td>
-                    <td><button class='btn btn-sm btn-danger'>Delete</button></td>
+                    <td><button onclick='deleteData({$data['id']})' class='btn btn-sm btn-danger' >Delete</button></td>
+                    
                 </tr>";
         $sl++;
     }
@@ -135,8 +136,24 @@ function update(){
     else{
         echo '<div class="alert alert-danger">update not success</div>';
     }
+}
 
-    
+// Delete Student data
+function delete(){
+    global$con;
+    $id = $_POST['id'];
+
+    $sql = "DELETE FROM student_list WHERE id = '$id'";
+
+    $result = $con->query($sql);
+
+    if($result){
+        echo '<div class="alert alert-success">Successfully Deleted</div>';
+    }
+    else{
+        echo '<div class="alert alert-success">Unsuccessful Delete</div>';
+
+    }
 }
 
 
