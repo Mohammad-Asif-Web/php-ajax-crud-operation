@@ -134,3 +134,27 @@ function deleteData(id){
     }
 }
 
+// 
+$('#search').keyup(function(){
+    var query = $('#search').val();
+    var action = "Search";
+    if(query != ''){
+     $.ajax({
+      'url':'process.php',
+      'type':'POST',
+      'data':{
+        'queryId':query, 
+        'action':action,
+        'checker':'searchData'
+    },
+      'success':function(data){
+        $('#show').html(data)
+      }
+     });
+    } else {
+    showStudent()
+    }
+
+});
+
+

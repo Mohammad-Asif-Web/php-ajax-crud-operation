@@ -52,6 +52,7 @@
             
             <div class="col-md-7 text-center m-1 bg-one mx-auto">
                 <h3>Student List</h3>
+                <input type="text" name="search" id="search" placeholder="Search" class="form-control" /><br>
                 <div id="show" class="w-100"></div>
             </div>
         </div>

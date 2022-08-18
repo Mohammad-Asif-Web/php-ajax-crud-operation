@@ -3,13 +3,11 @@
 include 'database.php';
 
 $checker = $_POST['checker'];
-
 $checker();
 
 // if the checker variable has insert value, then the insert function will call or if it has update value then the update function will execute.
 // $checker() same as insert() when the value is insert
 // $checker() same as update() when the value is update.
-
 
 // Insert Student Data to Mysql Database
 function insert(){
@@ -155,6 +153,63 @@ function delete(){
 
     }
 }
+
+function searchData(){
+    
+if($_POST["action"] == "Search")
+{
+    global $con;
+ $search = mysqli_real_escape_string($con, $_POST["queryId"]);
+ $query = "
+ SELECT * FROM student_list 
+ WHERE id LIKE '%".$search."%' 
+ ORDER BY id DESC
+ ";
+ 
+//  alter
+$result = $con->query($query);
+    // here the $show string is empty for not repeat same data every click. because database sends all data every click.
+    $show = '';
+
+    // this is normal table format concatenate with show variable
+    $show .= "<table class='table border text-white bg-success'>
+            <thead>
+                <tr>
+                    <th>Sl no</th>
+                    <th>Student Name</th>
+                    <th>Father Name</th>
+                    <th>Mother Name</th>
+                    <th>Email</th>
+                    <th>District</th>
+                    <th>Department</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>";
+    $sl = 1;
+    // $data stores the data as objects
+    while($data = $result->fetch_assoc()){
+    $show .=   "<tr>
+                    <td>".$sl."</td>
+                    <td>".$data['name']."</td>
+                    <td>".$data['fatherName']."</td>
+                    <td>".$data['motherName']."</td>
+                    <td>".$data['email']."</td>
+                    <td>".$data['district']."</td>
+                    <td>".$data['department']."</td>
+                    <td><button onclick='editData({$data['id']})' class='btn btn-sm btn-secondary' >Edit</button></td>
+                    <td><button onclick='deleteData({$data['id']})' class='btn btn-sm btn-danger' >Delete</button></td>
+                    
+                </tr>";
+        $sl++;
+    }
+    $show .="</tbody>
+            </table>";
+
+    echo $show;
+}
+}
+
 
 
 ?>
