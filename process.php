@@ -1,213 +1,262 @@
 <?php
 
-include 'database.php';
+class process{
+    private $host = 'localhost';
+    private $user = 'root';
+    private $password = '';
+    private $db_name = 'md_asif';
+    private $con;
+    
+    //database connection
+    function __construct()
+    {
+        $this->con = new mysqli($this->host,$this->user,$this->password,$this->db_name);
 
-$checker = $_POST['checker'];
-$checker();
-
-// if the checker variable has insert value, then the insert function will call or if it has update value then the update function will execute.
-// $checker() same as insert() when the value is insert
-// $checker() same as update() when the value is update.
-
-// Insert Student Data to Mysql Database
-function insert(){
-    global $con;
-
-    $name = $_POST['name'];
-    $fatherName = $_POST['fName'];
-    $motherName = $_POST['mName'];
-    $email= $_POST['email'];
-    $dist = $_POST['dist'];
-    $dept = $_POST['dept'];
-
-    if(empty($name)){
-        echo '<div class="alert alert-danger">Name field required</div>'; 
-    } 
-    if(empty($fatherName)){
-        echo '<div class="alert alert-danger">Father name field required</div>'; 
-    } 
-    if(empty($motherName)){
-        echo '<div class="alert alert-danger">Mother name field required</div>'; 
-    } 
-    if(empty($email)){
-        echo '<div class="alert alert-danger">Email required</div>'; 
-    } 
-    if(empty($dist)){
-        echo '<div class="alert alert-danger">District required</div>'; 
-    } 
-    if(empty($dept)){
-        echo '<div class="alert alert-danger">Department required</div>'; 
-    } 
-    else {
-        $sql = "INSERT INTO student_list(name, fatherName, motherName, email, district, department) VALUES ('$name', '$fatherName', '$motherName', '$email', '$dist', '$dept')";
-        $result = $con->query($sql);
-
-        if($result){
-            echo '<div class="alert alert-success bg-info">Data Inserted</div>';
+        if($this->con->connect_error){
+            echo 'connection failed';
         } else{
-            echo '<div class="alert alert-success bg-danger">Data Not Inserted </div>';
+            return $this->con;
         }
     }
-}
-// Show all Student Data
-function show(){
-    global $con;
-    // sql command to select the all data from database
-    $sql = "SELECT * FROM student_list";
-    // query for execute the data, otherwise it will not work. here the $result stores the data as array
-    $result = $con->query($sql);
-    // here the $show string is empty for not repeat same data every click. because database sends all data every click.
-    $show = '';
 
-    // this is normal table format concatenate with show variable
-    $show .= "<table class='table border text-white bg-success'>
-            <thead>
-                <tr>
-                    <th>Sl no</th>
-                    <th>Student Name</th>
-                    <th>Father Name</th>
-                    <th>Mother Name</th>
-                    <th>Email</th>
-                    <th>District</th>
-                    <th>Department</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>";
-    $sl = 1;
-    // $data stores the data as objects
-    while($data = $result->fetch_assoc()){
-    $show .=   "<tr>
-                    <td>".$sl."</td>
-                    <td>".$data['name']."</td>
-                    <td>".$data['fatherName']."</td>
-                    <td>".$data['motherName']."</td>
-                    <td>".$data['email']."</td>
-                    <td>".$data['district']."</td>
-                    <td>".$data['department']."</td>
-                    <td><button onclick='editData({$data['id']})' class='btn btn-sm btn-secondary' >Edit</button></td>
-                    <td><button onclick='deleteData({$data['id']})' class='btn btn-sm btn-danger' >Delete</button></td>
-                    
-                </tr>";
-        $sl++;
+    // get data into table function
+    public function getDataIntoTable($sql){
+        $result = mysqli_query($this->con, $sql);
+        $show = '';
+        $show .= "<table class='table table-bordered table-striped text-white bg-color-1'>
+                <thead class='bg-secondary fw-600 text-uppercase'>
+                    <tr>
+                        <th>ID</th>
+                        <th>Amount</th>
+                        <th>Buyer</th>
+                        <th>Items</th>
+                        <th>Buyer Email</th>
+                        <th>Buyer IP</th>
+                        <th>Note</th>
+                        <th>City</th>
+                        <th>Phone</th>
+                        <th>Entry_at</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>";
+
+        while($data = $result->fetch_assoc()){
+        $show .=   "<tr class='fw-bold'>
+                        <td>".$data['id']."</td>
+                        <td>".$data['amount']."</td>
+                        <td>".$data['buyer']."</td>
+                        <td>".$data['items']."</td>
+                        <td>".$data['buyer_email']."</td>
+                        <td>".$data['buyer_ip']."</td>
+                        <td>".$data['note']."</td>
+                        <td>".$data['city']."</td>
+                        <td>".$data['phone']."</td>
+                        <td>".$data['entry_at']."</td>
+                        <td>
+                            <button class='btn btn-sm btn-info mb-1' onclick=editData({$data['id']})>Edit</button>
+                            <button class='btn btn-sm btn-danger' onclick=deleteData({$data['id']})>Delete</button>
+                        </td>
+                    </tr>";
+        }
+        $show .="</tbody>
+                </table>";
+        echo $show;
     }
-    $show .="</tbody>
-            </table>";
 
-    echo $show;
+    // data insert
+    public function insertData(){
+        $amount = $_POST['amount'];
+        $buyer = $_POST['buyer'];
+        $items= $_POST['items'];
+        $buyer_email = $_POST['buyer_email'];
+        $note = $_POST['note'];
+        $city = $_POST['city'];
+        $phone = $_POST['phone'];
 
-}
+        // get ip address
+        function getIPAddress() {  
+            //whether ip is from the share internet  
+             if(!empty($_SERVER['HTTP_CLIENT_IP'])) {  
+                        $ip = $_SERVER['HTTP_CLIENT_IP'];  
+                }  
+            //whether ip is from the proxy  
+            elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {  
+                        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];  
+             }  
+        //whether ip is from the remote address  
+            else{  
+                     $ip = $_SERVER['REMOTE_ADDR'];  
+             }  
+             return $ip;  
+        }  
+        $ip = getIPAddress(); 
 
-// edit specific student data
-function editData(){
-    global $con;
-    $id = $_POST['id'];
-    // sql command to select the all data from database
-    $sql = "SELECT * FROM student_list WHERE id = '$id'";
-    // query for execute the data, otherwise it will not work. here the $result stores the data as array
-    $result = $con->query($sql);
-    $show ="";
-    while($data = $result->fetch_assoc()){
-        $show = $data;
-    }
-    echo json_encode($show);
-}
-
-// Update all Student Data
-function update(){
-    global $con;
-
-    $id = $_POST['id'];
-    $name = $_POST['name'];
-    $fatherName = $_POST['fName'];
-    $motherName = $_POST['mName'];
-    $email= $_POST['email'];
-    $dist = $_POST['dist'];
-    $dept = $_POST['dept'];
-
-    $sql = "UPDATE student_list SET name ='$name', fatherName = '$fatherName', motherName = '$motherName', email = '$email', district = '$dist', department = '$dept' WHERE id = '$id'";
-    $result = $con->query($sql);
-
-    if($result){
-        echo '<div class="alert alert-success">student updated success</div>';
-    } 
-    else{
-        echo '<div class="alert alert-danger">update not success</div>';
-    }
-}
-
-// Delete Student data
-function delete(){
-    global$con;
-    $id = $_POST['id'];
-
-    $sql = "DELETE FROM student_list WHERE id = '$id'";
-
-    $result = $con->query($sql);
-
-    if($result){
-        echo '<div class="alert alert-success">Successfully Deleted</div>';
-    }
-    else{
-        echo '<div class="alert alert-success">Unsuccessful Delete</div>';
-
-    }
-}
-
-function searchData(){
+        
+        if(empty($amount)){
+            echo '<div class="alert alert-danger">Amount field is empty</div>'; 
+        } 
+        if(empty($buyer)){
+            echo '<div class="alert alert-danger">Buyer field required</div>'; 
+        } 
+        if(empty($items)){
+            echo '<div class="alert alert-danger">Items field required</div>'; 
+        } 
+        if(empty($buyer_email)){
+            echo '<div class="alert alert-danger">Buyer Email field required</div>'; 
+        } 
+        if(empty($note)){
+            echo '<div class="alert alert-danger">Note field required</div>'; 
+        } 
+        if(empty($city)){
+            echo '<div class="alert alert-danger">City field required</div>'; 
+        } 
+        if(empty($phone)){
+            echo '<div class="alert alert-danger">Phone field required</div>'; 
+        }  
+        if((!empty($amount)) && (!empty($buyer)) && (!empty($items)) && (!empty($buyer_email)) && (!empty($note)) && (!empty($city)) && (!empty($phone))){
+            // amount validation for number only
+            if (!is_numeric($amount)){
+                echo '<div class="alert alert-danger">amount only number allowed</div>'; 
+            } 
+            // buyer validation for text, number, not more than 20 characters
+            else if(!preg_match("/^[a-zA-Z\s0-9]{0,20}+$/", $buyer)){
+                echo '<div class="alert alert-danger">buyer field only letter and number allowed</div>';
+            }
+             // items validation for text only
+            else if(ctype_digit($items)){
+                echo '<div class="alert alert-danger">items field only letters allowed</div>'; 
+            }
+            // buyer email validation
+            else if (!filter_var($buyer_email, FILTER_VALIDATE_EMAIL)) {
+                echo '<div class="alert alert-danger">Invalid Email Format</div>';
+            }
+            // note validation not more than 30 words and can be input unicode(bangla text) characters too.
+            else if ((strlen($note) > 30)){
+                echo '<div class="alert alert-danger">Invalid Note Format</div>';
+            }
+            // city validation for letter and spaces
+            else if (!preg_match("/^[a-zA-Z-' ]*$/",$city)) {
+                echo '<div class="alert alert-danger">city field only letter and spaces allowed</div>'; 
+            }
+            // phone validation for numbers only
+            else if (!is_numeric($phone)){
+                echo '<div class="alert alert-danger">phone field only number allowed</div>'; 
+            }
+            else{
+                $sql = "INSERT INTO user (amount, buyer, items, buyer_email, buyer_ip, note, city, phone, entry_at) VALUES ('$amount', '$buyer', '$items', '$buyer_email', '$ip', '$note', '$city', '$phone', NOW())";
+                $result = mysqli_query($this->con, $sql);
     
-if($_POST["action"] == "Search")
-{
-    global $con;
- $search = mysqli_real_escape_string($con, $_POST["queryId"]);
- $query = "
- SELECT * FROM student_list 
- WHERE id LIKE '%".$search."%' 
- ORDER BY id DESC
- ";
- 
-//  alter
-$result = $con->query($query);
-    // here the $show string is empty for not repeat same data every click. because database sends all data every click.
-    $show = '';
-
-    // this is normal table format concatenate with show variable
-    $show .= "<table class='table border text-white bg-success'>
-            <thead>
-                <tr>
-                    <th>Sl no</th>
-                    <th>Student Name</th>
-                    <th>Father Name</th>
-                    <th>Mother Name</th>
-                    <th>Email</th>
-                    <th>District</th>
-                    <th>Department</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>";
-    $sl = 1;
-    // $data stores the data as objects
-    while($data = $result->fetch_assoc()){
-    $show .=   "<tr>
-                    <td>".$sl."</td>
-                    <td>".$data['name']."</td>
-                    <td>".$data['fatherName']."</td>
-                    <td>".$data['motherName']."</td>
-                    <td>".$data['email']."</td>
-                    <td>".$data['district']."</td>
-                    <td>".$data['department']."</td>
-                    <td><button onclick='editData({$data['id']})' class='btn btn-sm btn-secondary' >Edit</button></td>
-                    <td><button onclick='deleteData({$data['id']})' class='btn btn-sm btn-danger' >Delete</button></td>
-                    
-                </tr>";
-        $sl++;
+                if($result){
+                echo '<div class="alert alert-success bg-info">"Data Inserted". Reload the browser</div>';
+                } else{
+                echo '<div class="alert alert-success bg-danger">"Data Not Inserted"</div>';
+                }
+            }
+        }
     }
-    $show .="</tbody>
-            </table>";
 
-    echo $show;
-}
+    // Show all Student Data
+    public function show(){
+        $sql = "SELECT * FROM user";
+        echo $this->getDataIntoTable($sql);
+    }
+
+    // edit specific data
+    public function editData(){
+        $id = $_POST['id'];
+        $sql = "SELECT * FROM user WHERE id = '$id'";
+        $result = mysqli_query($this->con, $sql);
+        $show ="";
+        while($data = $result->fetch_assoc()){
+            $show = $data;
+        }
+        echo json_encode($show);
+    }
+
+    // update student
+    public function updateData(){
+        $id = $_POST['id'];
+        $amount = $_POST['amount'];
+        $buyer = $_POST['buyer'];
+        $items = $_POST['items'];
+        $buyer_email = $_POST['buyer_email'];
+        $note = $_POST['note'];
+        $city = $_POST['city'];
+        $phone = $_POST['phone'];
+
+        $sql = "UPDATE user SET amount='$amount', buyer='$buyer', items='$items', buyer_email='$buyer_email', note='$note', city='$city', phone='$phone' WHERE id ='$id' ";
+        $result = mysqli_query($this->con, $sql);
+        if($result){
+            echo '<div class="alert alert-success">Data Updated Successfully</div>';
+        } else {
+            echo '<div class="alert alert-danger">Data Not Updated</div>';
+
+        }
+    }
+
+    // delete data
+    // delete data
+    public function delete(){
+        $id = $_POST['id'];
+
+        $sql = "DELETE FROM user WHERE id = '$id'";
+
+        $result = mysqli_query($this->con, $sql);
+
+        if($result){
+            echo '<div class="alert alert-success">Successfully Deleted</div>';
+        }
+        else{
+            echo '<div class="alert alert-success">Unsuccessful Delete</div>';
+
+        }
+    }
+    
+    // search Data
+    public function searchData(){
+        if($_POST["action"] == "Search"){
+        $search = mysqli_real_escape_string($this->con, $_POST["queryId"]);
+        $query = "
+        SELECT * FROM user 
+        WHERE id LIKE '%".$search."%' 
+        ORDER BY id DESC
+        ";
+        echo $this->getDataIntoTable($query);             
+        }
+    }
+
+}//class end
+
+
+$obj = new process();
+
+if(isset($_POST['checker'])){
+    // data insert
+    if($_POST['checker'] == 'insert'){
+        $obj->insertData();
+    }
+
+    // Read Data
+    if($_POST['checker'] == 'show'){
+        $obj->show();
+    }
+    // edit data
+    if($_POST['checker'] == 'editData'){
+        $obj->editData();
+    }
+    // update student
+    if($_POST['checker'] == 'updateData'){
+        $obj->updateData();
+    }
+    // delete data
+    if($_POST['checker'] == 'delete'){
+        $obj->delete();
+    }
+    // Search Data
+    if($_POST['checker'] == 'searchData'){
+        $obj->searchData();
+    }
 }
 
 

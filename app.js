@@ -1,52 +1,58 @@
 $(document).ready(function(){
-    $("#id").css("display", "none");
-    showStudent()
+    $("#upStd").hide();
+    $("#id").hide()
+    showData()
+
     $('#addStd').click(function(){
-        addStudent()
-        
+        addData()
         return false;
     })
 
     $('#upStd').click(function(){
-        updateStudent()
-
+        updateData();
+        $("#upStd").hide();
+        $("#id").hide()
+        $("#addStd").show()
         return false;
     })
-
-    
 })
 
-
-// If we click addStudent, then the add student function will be call. a variable name 'checker' it has value insert, if it becomes sucess then the data will be added to msg section
-function addStudent(){
-    var myName = $('#myName').val()
-    var fatherName = $('#fName').val()
-    var motherName = $('#mName').val()
-    var email = $('#email').val()
-    var dist = $('#dist').val()
-    var dept = $('#dept').val()
+function addData(){
+    var amount = $('#amount').val()
+    var buyer = $('#buyer').val()
+    var items = $('#items').val()
+    var buyerEmail = $('#buyer_email').val()
+    var note = $('#note').val()
+    var city = $('#city').val()
+    var phone = $('#phone').val()
    $.ajax({
     'url' : 'process.php',
     'type' : 'POST',
     'data' : {
-        'name' : myName,
-        'fName' : fatherName,
-        'mName' : motherName,
-        'email' : email, 
-        'dist' : dist,
-        'dept' : dept,
-        // this 'checker' value will be connect in php variable $checker. that's how php and ajax communicate
+        'amount' : amount,
+        'buyer' : buyer,
+        'items' : items, 
+        'buyer_email' : buyerEmail,
+        'note' : note,
+        'city' : city,
+        'phone' : phone,
         'checker' : 'insert'
     },
-    // when we has set a url to 'process.php', if it becomes success, all the data will be store to functon(data)
     'success' : function(data){
-        $('#msg').html(data).fadeOut(1000)
+        $('#msg').html(data).fadeOut(3000);
+        $('#amount').val("");
+        $('#buyer').val("");
+        $('#items').val("");
+        $('#buyer_email').val("");
+        $('#note').val("");
+        $('#city').val("");
+        $('#phone').val("");
     }
    })
 }
 
 // show list to website
- function showStudent(){
+ function showData(){
     $.ajax({
         'url' : 'process.php',
         'type' : 'POST',
@@ -59,60 +65,71 @@ function addStudent(){
     })
 }
 
-// edit students data from list
-function editData(id){
-    $("#id").css("display", "block");
-    $.ajax({
-        'url' : 'process.php',
-        'type' : 'POST',
-        'dataType' : 'JSON',
-        'data' : {
-            'checker' : 'editData',
-            'id' : id
-        },
-        'success' : function(data){
-            $('#myName').val(data.name)
-            $('#fName').val(data.fatherName)
-            $('#mName').val(data.motherName)
-            $('#email').val(data.email)
-            $('#dist').val(data.district)
-            $('#dept').val(data.department)
-            $('#id').val(data.id)
-        }
-    })
-}
+// Edit Specific Data
+    function editData(id){
+        $("#upStd").show();
+        $("#id").show();
+        $("#addStd").hide();
+        $.ajax({
+            'url' : 'process.php',
+            'type' : 'POST',
+            'dataType' : 'JSON',
+            'data' : {
+                'id' : id,
+                'checker' : 'editData'
+            },
+            'success': function(data){
+                $('#amount').val(data.amount);
+                $('#buyer').val(data.buyer);
+                $('#items').val(data.items);
+                $('#buyer_email').val(data.buyer_email);
+                $('#note').val(data.note);
+                $('#city').val(data.city);
+                $('#phone').val(data.phone);
+                $('#id').val(data.id);
+            }
+        })
+    }
 
-// update button when edit is complete
-function updateStudent(){
-    $("#id").css("display", "none");
-    var id = $('#id').val()
-    var myName = $('#myName').val()
-    var fatherName = $('#fName').val()
-    var motherName = $('#mName').val()
-    var email = $('#email').val()
-    var dist = $('#dist').val()
-    var dept = $('#dept').val()
-    $.ajax({
-        'url' : 'process.php',
-        'type' : 'POST',
-        'data' : {
-            'id' : id,
-            'name' : myName,
-            'fName' : fatherName,
-            'mName' : motherName,
-            'email' : email, 
-            'dist' : dist,
-            'dept' : dept,
-            'checker' : 'update'
-        },
-        'success' : function(data){
-            $('#msg').html(data).fadeOut(1000)
-            showStudent()
-        }
-    })
-}
+    function updateData(){
+        var id = $("#id").val();
+        var amount = $('#amount').val()
+        var buyer = $('#buyer').val()
+        var items = $('#items').val()
+        var buyer_email = $('#buyer_email').val()
+        var note = $('#note').val()
+        var city = $('#city').val()
+        var phone = $('#phone').val()
+        $.ajax({
+            'url' : 'process.php',
+            'method' : 'POST',
+            'data' : {
+                'id' : id,
+                'amount' : amount,
+                'buyer' : buyer,
+                'items' : items,
+                'buyer_email' : buyer_email,
+                'note' : note,
+                'city' : city,
+                'phone' : phone,
+                'checker' : 'updateData'
+            },
+            'success' : function(data){
+                $('#msg').html(data).fadeOut(3000)
+                showData()
+                $('#amount').val("");
+                $('#buyer').val("");
+                $('#items').val("");
+                $('#buyer_email').val("");
+                $('#note').val("");
+                $('#city').val("");
+                $('#phone').val("");
 
-// Delete Student data
+            }
+        })
+    }
+
+    // Delete Student data
 function deleteData(id){
     if(confirm(`warning id ${id} will be delete!`)){
         $.ajax({
@@ -124,7 +141,7 @@ function deleteData(id){
             },
             'success' : function(data){
                 $('#msg').html(data).fadeOut(1000)
-                showStudent()
+                showData()
             }
         })
     }
@@ -134,7 +151,10 @@ function deleteData(id){
     }
 }
 
-// 
+
+
+
+// live search
 $('#search').keyup(function(){
     var query = $('#search').val();
     var action = "Search";
@@ -152,9 +172,6 @@ $('#search').keyup(function(){
       }
      });
     } else {
-    showStudent()
+        showData()
     }
-
 });
-
-

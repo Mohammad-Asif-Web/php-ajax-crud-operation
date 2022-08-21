@@ -2,15 +2,26 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    list-style: none;
-    text-decoration: none;
 }
-
 body{
-    background-color: tomato;
-    color: #fff;
+    background-color: rgb(59, 163, 153) !important;
+    position: relative;
+}
+.bg-color-1{
+    background-color: rgb(31, 128, 128);
 }
 
-.bg-one{
-    background-color: lightcoral;
+.main-section{
+    margin-bottom: 100px;
+}
+footer{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: grey;
+}
+footer a{
+    color: #fff;
+    text-decoration: dashed;
 }
